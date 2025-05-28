@@ -1,14 +1,30 @@
-import datetime
+from datetime import datetime
 
-from fastapi import Depends, FastAPI, HTTPException, Query
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import SQLModel, Field
 
-
-class Ingredient(SQLModel, table=True):
-    """食材"""
-
-    id: int | None = Field(default=None, primary_key=True)
+"""原材料类"""
+class IngredientBase(SQLModel):
     name: str = Field(index=True)
-    type: str
+    type: int
+    unit: str 
     process: str
-    duration: datetime.timedelta
+    duration: int
+
+
+class Ingredient(IngredientBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    create_date: datetime
+    update_date: datetime
+
+
+class IngredientCreate(IngredientBase):
+    create_date: datetime  = Field(default_factory=datetime.now)
+
+
+class IngredientUpdate(IngredientBase):
+    name: str | None = None # type: ignore
+    type: str | None = None  # type: ignore
+    unit: str | None = None  # type: ignore
+    process: str | None = None # type: ignore
+    duration: int | None = None # type: ignore
+    update_date: datetime | None = Field(default_factory=datetime.now)
