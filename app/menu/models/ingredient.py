@@ -1,6 +1,8 @@
 from datetime import datetime
+from typing import List
 
-from sqlmodel import SQLModel, Field
+from sqlmodel import Relationship, SQLModel, Field
+
 
 """原材料类"""
 class IngredientBase(SQLModel):
@@ -16,15 +18,17 @@ class Ingredient(IngredientBase, table=True):
     create_date: datetime
     update_date: datetime
 
+    dishes: List["DishIngredient"] = Relationship(back_populates="ingredient")
+
 
 class IngredientCreate(IngredientBase):
     create_date: datetime  = Field(default_factory=datetime.now)
 
 
 class IngredientUpdate(IngredientBase):
-    name: str | None = None # type: ignore
-    type: str | None = None  # type: ignore
-    unit: str | None = None  # type: ignore
-    process: str | None = None # type: ignore
-    duration: int | None = None # type: ignore
+    name: str | None = None
+    type: str | None = None 
+    unit: str | None = None 
+    process: str | None = None
+    duration: int | None = None
     update_date: datetime | None = Field(default_factory=datetime.now)
