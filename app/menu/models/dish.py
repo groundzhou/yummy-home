@@ -1,10 +1,14 @@
 from datetime import datetime
-from typing import List
+from typing import List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
+from pydantic import BaseModel
 
-from .ingredient import Ingredient
+# 仅用于类型检查
+if TYPE_CHECKING:
+    from .dish_ingredient import DishIngredient, DishIngredientRead
 
-"""菜品实体"""
+
+# 菜品实体
 class DishBase(SQLModel):
     name: str = Field(index=True)
     type: int
@@ -13,11 +17,13 @@ class DishBase(SQLModel):
 
 
 class Dish(DishBase, table=True):
+    __tablename__ = "dish"  # 指定表名
+
     id: int | None = Field(default=None, primary_key=True)
     create_date: datetime | None
-    update_date: datetime | None = None 
-    ingredients: List["DishIngredient"] | None = Relationship(back_populates="dish")
-    
+    update_date: datetime | None = None
+    ingredients: List["DishIngredient"] = Relationship(back_populates="dish")
+
 
 class DishCreate(DishBase):
     create_date: datetime | None = Field(default_factory=datetime.now)
@@ -26,21 +32,21 @@ class DishCreate(DishBase):
 class DishUpdate(DishBase):
     name: str | None = None
     type: str | None = None
-    ingredients: List["DishIngredient"] | None = None
     process: str | None = None
     duration: int | None = None
     update_date: datetime | None = Field(default_factory=datetime.now)
 
 
-# DishIngredient 表：关系表，包含顺序字段
-class DishIngredient(SQLModel, table=True):  # 定义为数据库表
-    id: int = Field(default=None, primary_key=True)
-    dish_id: int = Field(foreign_key="dish.id")
-    ingredient_id: int = Field(foreign_key="ingredient.id")
-    order: int  # 配料在菜品中的顺序
-    quantity: int  # 所需要的量
+# 修改 Dish 模型
+class DishRead(BaseModel):
+    id: int
+    name: str
+    type: int
+    process: str
+    duration: int
+    ingredients: List["DishIngredientRead"]  # 嵌套 DishIngredient 信息
+    create_date: datetime | None
+    update_date: datetime | None
 
-    # 关系：关联 Dish 和 Ingredient
-    dish: Dish = Relationship(back_populates="ingredients")
-    ingredient: Ingredient = Relationship(back_populates="dishes")
-  
+    class Config:
+        from_attributes = True
