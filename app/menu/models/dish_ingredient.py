@@ -1,12 +1,11 @@
 from typing import TYPE_CHECKING
-from sqlmodel import SQLModel, Field, Relationship, List
+from sqlmodel import SQLModel, Field, Relationship
 from pydantic import BaseModel
 
 # 仅用于类型检查
 if TYPE_CHECKING:
     from .dish import Dish
     from .ingredient import Ingredient, IngredientRead
-    from .process import Process
 
 
 # DishIngredient关系表

@@ -4,7 +4,7 @@ from sqlmodel import select
 
 from app.core.db import SessionDep
 from app.core.dependencies import get_token_header
-from ..models import Ingredient, IngredientCreate, IngredientUpdate
+from ..models import Ingredient, IngredientCreate, IngredientUpdate, Process
 
 router = APIRouter(
     prefix="/ingredients",
@@ -69,3 +69,19 @@ def update_ingredient(
     session.commit()
     session.refresh(ingredient_db)
     return ingredient_db
+
+
+# 创建食材处理流程
+@router.post("/{ingredient_id}/processes")
+def create_ingredient_process(ingredient_id: int, processes: list[Process], session: SessionDep):
+    ingredient_db = session.get(Ingredient, ingredient_id)
+    if not ingredient_db:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
+    
+    session.add_all(processes)
+    session.commit()
+    session.refresh(ingredient_db)
+    return ingredient_db
+
+
+

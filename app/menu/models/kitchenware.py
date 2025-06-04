@@ -14,6 +14,10 @@ class Kitchenware(KitchenwareBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
 
+class KitchenwareCreate(KitchenwareBase):
+    pass
+
+
 class KitchenwareUpdate(KitchenwareBase):
     name: str | None = None
     number: int | None = None

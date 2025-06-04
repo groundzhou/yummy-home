@@ -4,7 +4,8 @@ from sqlmodel import select
 
 from app.core.db import SessionDep
 from app.core.dependencies import get_token_header
-from ..models import Dish, DishCreate, DishUpdate, DishRead, DishIngredient, Ingredient
+from ..common.constant import ProcessType
+from ..models import Dish, DishCreate, DishUpdate, DishRead, DishIngredient, Ingredient, ProcessCreate
 
 router = APIRouter(
     prefix="/dishes",
@@ -162,3 +163,20 @@ def update_dish_ingredients(
     session.commit()
     session.refresh(dish_ingredient)
     return dish_ingredient
+
+
+# 创建菜品处理流程
+@router.post("/{dish_id}/processes")
+def create_ingredient_process(dish_id: int, processes: list[ProcessCreate], session: SessionDep):
+    dish_db = session.get(Dish, dish_id)
+    if not dish_db:
+        raise HTTPException(status_code=404, detail="Dish not found")
+    
+    for process in processes:
+        process.process_type = ProcessType.DISH
+        process.reference_id = dish_id
+
+    session.add_all(processes)
+    session.commit()
+    session.refresh(dish_db)
+    return dish_db

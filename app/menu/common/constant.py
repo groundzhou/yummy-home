@@ -25,3 +25,9 @@ class DishStatus(Enum):
     DRAFT = 1  # 草稿
     PUBLISHED = 2  # 已发布
     DELETED = 3  # 已删除
+
+
+# 流程类型
+class ProcessType(Enum):
+    DISH = 1
+    INGREDIENT = 2
